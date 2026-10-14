@@ -1,0 +1,61 @@
+.venv/
+out/
+obj/
+tests/*.gcno
+tests/*.d
+tests/*.bin
+tests/__pycache__
+coverage.* 
+callgrind.* 
+report.*
+massif.*
+ppm2jpeg
+metrics.json
+images/tests/terre.jpg
+images/tests/terre.ppm
+images/tests/terre.pgm
+images/tests/terre_ppm.jpg
+images/tests/terre_pgm.jpg
+gmon.out
+# Fichiers objets et dépendances du compilateur
+*.o
+*.d
+*.a
+*.so
+
+# Exécutables
+ppm2jpeg
+a.out
+
+# Fichiers de profilage et rapports d'exécution
+gmon.out
+rapport_temps.txt
+
+# Images de sortie / temporaires à la racine
+out.jpg
+
+# Préserver explicitement les dossiers de documentation et leurs visuels
+!diagrammes/
+!diagrammes/**
+!structures de donnees/
+!structures de donnees/**
+
+# Fichiers temporaires Python / pytest
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environnements virtuels
+.env
+.venv
+env/
+venv/
+
+# Fichiers système et éditeurs
+.DS_Store
+*.swp
+*~
+.vscode/
+.idea/

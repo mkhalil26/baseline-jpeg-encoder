@@ -1,0 +1,13 @@
+[tool.pytest]
+minversion = "9.0"
+addopts = ["-v", "--no-header", "-rP", "--junitxml=report.xml"]
+testpaths = ["tests"]
+
+[tool.gcovr]
+exclude = "tests/" 
+html = "coverage.html"
+print-summary = "yes"
+html-theme = "github.green"
+html-self-contained = "yes"
+fail-under-line = "80"       
+fail-under-branch = "70"    

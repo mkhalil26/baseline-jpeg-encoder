@@ -1,0 +1,85 @@
+image: gitlab.ensimag.fr:5050/docker-images/jpeg-env:latest
+
+stages:
+  - build
+  - quick-check
+  - eval
+  - deploy
+
+compilation:
+  stage: build
+  script:
+    - make ERR="-Werror" #Les warnings c'est le mal !
+  artifacts:
+    paths:
+      - ppm2jpeg
+      - tests/*.bin
+      - out/
+      - obj/*.gcno
+    expire_in: 1 hour
+
+verif_rapide:
+  stage: quick-check
+  script:
+    - python3 -m pytest -k "test_c_unity or test_integration[cli]"
+  artifacts:
+    paths:
+       - report.xml
+    reports:
+      junit: report.xml
+  dependencies:
+    - compilation
+
+integration:
+  stage: eval
+  script:
+    - |
+      PYTEST_EXIT_CODE=0
+      python3 -m pytest -k "test_c_unity or test_integration" || PYTEST_EXIT_CODE=$? # -n auto || PYTEST_EXIT_CODE=$?
+      mv metrics.json quality.json
+      gcovr -r . --cobertura coverage.xml --exclude-unreachable-branches --print-summary
+      exit $PYTEST_EXIT_CODE
+  coverage: '/^lines: (\d+\.\d+\%)/' 
+  artifacts:
+    when: always
+    paths:
+       - coverage.xml
+       - coverage.html
+       - quality.json
+       - report.xml
+    reports:
+      junit: report.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+  dependencies:
+    - compilation
+  allow_failure: true
+
+performance:
+  stage: eval
+  script:
+    - make perf
+    - mv metrics.json perf.json
+    - gprof2dot -f callgrind callgrind.biiiiiig.out | dot -Tsvg -o report.svg
+  artifacts:
+    paths:
+       - report.svg
+       - perf.json
+  dependencies: [] 
+  allow_failure: true
+
+pages:
+  stage: deploy
+  dependencies:
+    - integration  
+    - performance  
+  script:
+    - mkdir public
+    - jq -s '.[0] * .[1]' quality.json perf.json > merged.json
+    - python3 tests/generate_dashboard.py  
+    - cp coverage.html public/
+    - cp report.svg public/
+  artifacts:
+    paths:
+      - public

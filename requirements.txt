@@ -1,0 +1,6 @@
+pytest 
+gprof2dot 
+scikit-image
+gcovr
+pytest-xdist
+jinja2
